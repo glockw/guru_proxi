@@ -11,9 +11,14 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/api/business", async (request, response) => {
-  const { term, location } = request.query;
-  const { data } = await apollo.GetBusinesses(term, location);
-  response.json(data);
+  try {
+    const { term, location, offset } = request.query;
+    const { data } = await apollo.GetBusinesses(term, location, offset);
+    response.json(data);
+  } catch (error) {
+    response.status(404).json({ error: error });
+    return;
+  }
 });
 
 app.get("/api/business/:id", async (request, response) => {
@@ -27,6 +32,6 @@ app.get("/api/business/:id", async (request, response) => {
   }
 });
 const PORT = 5000;
-app.listen(PORT, () => {
+app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
